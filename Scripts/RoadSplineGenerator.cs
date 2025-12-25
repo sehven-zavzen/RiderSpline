@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class RoadSplineGenerator : MonoBehaviour
 {
+    [Header("Length")]
+    public int repeatSamples = 40;   // samples'ı kaç kere döndürelim (uzunluk)
+    public float curveMultiplier = 2.5f;
+    public float hillMultiplier = 2.0f;
+
+
     [Header("Input")]
     public string jsonFileName = "track.json"; // StreamingAssets
 
@@ -53,7 +59,8 @@ public class RoadSplineGenerator : MonoBehaviour
 
     private List<Vector3> BuildControlPoints(List<TrackSample> samples)
     {
-        var pts = new List<Vector3>(samples.Count);
+        int total = samples.Count * Mathf.Max(1, repeatSamples);
+        var pts = new List<Vector3>(total + 1);
 
         Vector3 pos = Vector3.zero;
         float headingDeg = 0f;
@@ -61,31 +68,28 @@ public class RoadSplineGenerator : MonoBehaviour
 
         pts.Add(pos);
 
-        for (int i = 0; i < samples.Count; i++)
+        for (int i = 0; i < total; i++)
         {
-            var s = samples[i];
+            var s = samples[i % samples.Count];
 
-            // energy ile viraj/hill etkisini artırmak istersen:
             float e = Mathf.Clamp01(s.energy);
-            float curve = Mathf.Clamp(s.curve, -1f, 1f) * Mathf.Lerp(1f, 1.8f, e);
-            float hill = Mathf.Clamp(s.hill, -1f, 1f) * Mathf.Lerp(1f, 1.6f, e);
 
-            // Heading update (curve -> dönme)
+            // ✅ Ekstremliği artır
+            float curve = Mathf.Clamp(s.curve, -1f, 1f) * curveMultiplier * Mathf.Lerp(1f, 1.8f, e);
+            float hill  = Mathf.Clamp(s.hill,  -1f, 1f) * hillMultiplier  * Mathf.Lerp(1f, 1.6f, e);
+
             headingDeg += curve * curveStrengthDeg;
             headingDeg = Mathf.Clamp(headingDeg, -maxHeadingDeg, maxHeadingDeg);
 
             float headingRad = headingDeg * Mathf.Deg2Rad;
             Vector3 forward = new Vector3(Mathf.Sin(headingRad), 0f, Mathf.Cos(headingRad));
 
-            // ilerle
             pos += forward * stepDistance;
 
-            // yükseklik: hedefe yumuşat
             float targetY = hill * hillStrength;
             y = Mathf.Lerp(y, targetY, hillSmoothing);
             pos.y = y;
 
-            // x sapmasını sınırlamak istersen:
             pos.x = Mathf.Clamp(pos.x, -lateralDriftClamp, lateralDriftClamp);
 
             pts.Add(pos);
@@ -93,6 +97,7 @@ public class RoadSplineGenerator : MonoBehaviour
 
         return pts;
     }
+
 
     private static string PathCombineStreamingAssets(string fileName)
     {
