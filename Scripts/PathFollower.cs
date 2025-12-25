@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class PathFollower : MonoBehaviour
 {
+    public float verticalOffset = 0.6f;
+
     public float laneOffset;      // runtime’da toplam offset
-    public float baseLaneOffset;  // note’un kendi lane offset’i (spawn’da set)
 
     public RoadSplineGenerator generator;
     public float speed = 12f;
@@ -33,6 +34,7 @@ public class PathFollower : MonoBehaviour
 
         // ✅ LANE OFFSET BURADA
         pos += right * laneOffset;
+        pos.y += verticalOffset;
         
         transform.position = pos;
 

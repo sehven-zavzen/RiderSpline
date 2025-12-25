@@ -9,7 +9,7 @@ public class SplineRoadMeshExtruder : MonoBehaviour
 
     [Header("Road")]
     public float roadWidth = 8f;     // total width
-    public float yOffset = 0.1f;     // zeminle çakışmasın
+    public float yOffset = -0.3f;     // zeminle çakışmasın
     public bool flipNormals = false;
 
     [Header("Sampling")]
