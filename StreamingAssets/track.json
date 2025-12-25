@@ -1,0 +1,11 @@
+{
+  "bpm": 128,
+  "secondsPerSample": 0.25,
+  "samples": [
+    { "curve": 0.10, "hill": 0.00, "energy": 0.20 },
+    { "curve": 0.15, "hill": 0.05, "energy": 0.25 },
+    { "curve": 0.05, "hill": 0.10, "energy": 0.30 },
+    { "curve": -0.20, "hill": 0.15, "energy": 0.60 },
+    { "curve": -0.10, "hill": 0.08, "energy": 0.40 }
+  ]
+}
